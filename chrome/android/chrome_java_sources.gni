@@ -6,6 +6,7 @@ kiwi_java_sources = [
   "java/src/org/chromium/chrome/browser/AppMenuBridge.java",
   "java/src/org/chromium/chrome/browser/PersonalizeResults.java",
   "java/src/org/chromium/chrome/browser/FixDevToolsWindow.java",
+  "java/src/org/chromium/chrome/browser/TvCursorOverlay.java",
   "java/src/org/chromium/chrome/browser/accessibility/settings/NightScalePreference.java",
   "java/src/org/chromium/chrome/browser/compositor/layouts/phone/StackLayout.java",
   "java/src/org/chromium/chrome/browser/compositor/layouts/phone/StackLayoutBase.java",

@@ -394,6 +394,10 @@ public class ChromeTabbedActivity extends ChromeActivity<ChromeActivityComponent
     private TabSwitcherBackPressHandler mTabSwitcherBackPressHandler;
     private MinimizeAppAndCloseTabBackPressHandler mMinimizeAppAndCloseTabBackPressHandler;
 
+    // TV cursor overlay for Android TV D-pad navigation
+    private TvCursorOverlay mTvCursorOverlay;
+    private boolean mTvCursorInitChecked;
+
     // ID assigned to each ChromeTabbedActivity instance in Android S+ where multi-instance feature
     // is supported. This can be explicitly set in the incoming Intent or internally assigned.
     private int mWindowId;
@@ -2658,6 +2662,12 @@ public class ChromeTabbedActivity extends ChromeActivity<ChromeActivityComponent
 
     @Override
     public void onDestroyInternal() {
+        // Clean up TV cursor overlay
+        if (mTvCursorOverlay != null) {
+            mTvCursorOverlay.destroy();
+            mTvCursorOverlay = null;
+        }
+
         if (mReadingListBackPressHandler != null) {
             mReadingListBackPressHandler.destroy();
             mReadingListBackPressHandler = null;
@@ -2749,6 +2759,17 @@ public class ChromeTabbedActivity extends ChromeActivity<ChromeActivityComponent
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        // Lazy-initialize TV cursor overlay on first key event if we're on a TV
+        if (!mTvCursorInitChecked) {
+            mTvCursorInitChecked = true;
+            mTvCursorOverlay = TvCursorOverlay.attachToActivityIfTV(this);
+        }
+
+        // Let the TV cursor overlay handle D-pad events first
+        if (mTvCursorOverlay != null && mTvCursorOverlay.handleKeyEvent(event)) {
+            return true;
+        }
+
         Boolean result = KeyboardShortcuts.dispatchKeyEvent(event, mUIWithNativeInitialized,
                 getFullscreenManager(), /* menuOrKeyboardActionController= */ this);
         return result != null ? result : super.dispatchKeyEvent(event);
